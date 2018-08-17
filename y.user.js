@@ -1,5 +1,7 @@
-// ==UserScript== 
+// ==UserScript==
 // @name Y
+// @version 1.0
+// @run-at         document-start
 // @include https://m.youtube.com/*
 // ==/UserScript==
 
@@ -7,7 +9,7 @@ var MOVIE_NAME = [
     ['gười đà', 180, 100],
     ['ọ lem th', 180, 100]
 ]
-        
+
 var _url = location.href
 var isKeyDown = false;
 var isForcePause = false;
@@ -22,59 +24,6 @@ var video_height = 'height:720px;width:1280px;'
 var video_height = 'height:1080px;width:1920px;'
 var video_height = 'height:1050px;width:1867px;'
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var eventify = function eventify(self) {
-    self.events = {};
-
-    self.on = function (event, listener) {
-        if (_typeof(self.events[event]) !== 'object') {
-            self.events[event] = [];
-        }
-
-        self.events[event].push(listener);
-    };
-
-    self.removeListener = function (event, listener) {
-        var idx = void 0;
-
-        if (_typeof(self.events[event]) === 'object') {
-            idx = self.events[event].indexOf(listener);
-
-            if (idx > -1) {
-                self.events[event].splice(idx, 1);
-            }
-        }
-    };
-
-    self.emit = function (event) {
-        var i,
-            listeners,
-            length,
-            args = [].slice.call(arguments, 1);
-
-        if (_typeof(self.events[event]) === 'object') {
-            listeners = self.events[event].slice();
-            length = listeners.length;
-
-            for (i = 0; i < length; i++) {
-                listeners[i].apply(self, args);
-            }
-        }
-    };
-
-    self.once = function (event, listener) {
-        self.on(event, function g() {
-            self.removeListener(event, g);
-            listener.apply(self, arguments);
-        });
-    };
-};
-
-var myEmitter = {}
-eventify(myEmitter)
-//myEmitter.on('video_end', function() {
-//})
 
 //(function(document, window) {
 window.setTimeout(function() {
@@ -133,10 +82,6 @@ window.setTimeout(function() {
             window.p.setAttribute('style',video_height) //  + 'border: 5px solid green'
             window.p.querySelector('video').setAttribute('style',video_height)
             
-            setTimeout(function() {
-                document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')[1].setAttribute('style', 'position:absolute;right:0;top:1080px;background:#fff;display:block;z-index:99999')
-            }, 2000)
-            
             var data = window.p.getVideoData()
             document.title = '@' + data['title'] + ' - Youtube'
             
@@ -180,6 +125,15 @@ window.setTimeout(function() {
                     window.p.playVideo()
                 }
             }, 200)
+            
+            //setTimeout(function() {
+            var right = document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')
+            while(!right) {
+                right = document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')
+            }
+            right[1].setAttribute('style', 'position:absolute;right:0;top:1080px;background:#fff;display:block;z-index:99999')
+            console.log('ytm-item-section-renderer', right)
+            //}, 1000)
             
             var dur = window.p.getDuration()
             i___2 = setInterval(function() {

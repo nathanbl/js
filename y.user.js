@@ -1,3 +1,8 @@
+// ==UserScript== 
+// @name Y
+// @include https://m.youtube.com/*
+// ==/UserScript==
+
 var MOVIE_NAME = [
     ['gười đà', 180, 100],
     ['ọ lem th', 180, 100]

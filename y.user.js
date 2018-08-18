@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Y
-// @version 1.1
+// @version 1.0
 // @run-at         document-start
 // @include https://m.youtube.com/*
 // ==/UserScript==
@@ -47,7 +47,7 @@ function _checkNum(n) {
 //(function(document, window) {
 window.setTimeout(function() {
     video_width = '100%'; //window.innerWidth
-    video_height = window.innerHeight
+    video_height = parseInt(window.innerHeight, 10)
     if(!_checkNum(video_height)) {
         video_height = 550 + 50
     }

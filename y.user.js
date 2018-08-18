@@ -25,9 +25,14 @@ var i___2 = null;
 var video_height = 'height:720px;width:1280px;'
 var video_height = 'height:1080px;width:1920px;'
 var video_height = 'height:1050px;width:1867px;'*/
-var video_width=1100
-var video_height=619
+var video_width=window.innerWidth
+var video_height=window.innerHeight - 50
 var video_css='width:'+video_width+'px; height:'+video_height+'px;'
+
+var video_getPlayer_iv = 5 * 1000
+var video_currentCheck_iv = 1 * 1000
+
+console.log(video_css)
 
 //(function(document, window) {
 window.setTimeout(function() {
@@ -121,8 +126,9 @@ window.setTimeout(function() {
             
             window.p.playVideo()
             
-            while(window.vid.paused) {
+            if (window.vid.paused) {
                 window.p.playVideo()
+                return;
             }
             //setTimeout(function() {
                 if (!window.vid.paused) {
@@ -141,8 +147,8 @@ window.setTimeout(function() {
                 console.log('ytm-playlist', right)
             } else {
                 var right = document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')
-                while(!right) {
-                    right = document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')
+                if (!right) {
+                    return
                 }
                 right[1].setAttribute('style', 'position:absolute;right:0;top:'+video_height+'px;background:#fff;display:block;z-index:99999')
                 console.log('ytm-item-section-renderer', right)
@@ -182,21 +188,19 @@ window.setTimeout(function() {
                     }, 2000)*/
                     //clearInterval(i___2)
                 }
-            }, 1000)
+            }, video_currentCheck_iv)
         }
         /*
         i___0 = setInterval(function() {
             //console.log('getPlayer', i___0)
             getPlayer()
-        }, 1000)*/
+        }, video_currentCheck_iv)*/
         
         i___1 = setInterval(function() {
             //console.log('startPlayer', i___1)
             getPlayer()
             startPlayer()
-        }, 2000)
-        
-        
+        }, video_getPlayer_iv)
         
     } else {
         if (_url.indexOf('watch?v=') == -1) {

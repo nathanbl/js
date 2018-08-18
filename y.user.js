@@ -69,7 +69,8 @@ window.setTimeout(function() {
                 console.log('not found video')
                 return;
             }
-            console.log('window.my_played', window.my_played)
+            console.log('window.my_played', window.my_played, window.vid.src)
+            if (!window.vid.src) return;
             if (window.my_played == window.vid.src) {
                 console.log('startPlayer old')
                 if (window.vid.paused) {

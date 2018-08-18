@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Y
-// @version 1.0
+// @version 2.0
 // @run-at         document-start
 // @include https://m.youtube.com/*
 // ==/UserScript==
@@ -168,6 +168,19 @@ function startPlayer() {
     }
 
     window.dur = window.vid.duration
+    
+    /*
+    var isEnded = false
+    window.vid.ontimeupdate = function() {
+        if (isEnded) return;
+        console.log(window.vid.currentTime, cMovieEnd, window.dur)
+        var cur = window.vid.currentTime
+        if (window.dur > 0 && cur >= (window.dur - cMovieEnd)) {
+            window.vid.currentTime = window.dur - 2;
+            isEnded = true;
+            //window.dur = 0;
+        }
+    };*/
     
     i___2 = setInterval(function() {
         if(!window.vid) {

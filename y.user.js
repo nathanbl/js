@@ -18,12 +18,16 @@ var qualities = ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'smal
 window.p = null;
 window.vid = null;
 window.my_played = '0';
+window.dur = 0
 var i___1 = null;
 var i___2 = null;
+/*
 var video_height = 'height:720px;width:1280px;'
 var video_height = 'height:1080px;width:1920px;'
-var video_height = 'height:1050px;width:1867px;'
-
+var video_height = 'height:1050px;width:1867px;'*/
+var video_width=1100
+var video_height=619
+var video_css='width:'+video_width+'px; height:'+video_height+'px;'
 
 //(function(document, window) {
 window.setTimeout(function() {
@@ -77,10 +81,10 @@ window.setTimeout(function() {
             
             document.body.setAttribute('style','background: #000;')
             document.documentElement.setAttribute('style','background: #000;')
-            document.querySelector('#player').setAttribute('style',video_height)
+            document.querySelector('#player').setAttribute('style',video_css)
             document.querySelector('.player-container').setAttribute('style','right:0')
-            window.p.setAttribute('style',video_height) //  + 'border: 5px solid green'
-            window.p.querySelector('video').setAttribute('style',video_height)
+            window.p.setAttribute('style',video_css) //  + 'border: 5px solid green'
+            window.p.querySelector('video').setAttribute('style',video_css)
             
             var data = window.p.getVideoData()
             document.title = '@' + data['title'] + ' - Youtube'
@@ -117,32 +121,49 @@ window.setTimeout(function() {
             
             window.p.playVideo()
             
-            setTimeout(function() {
+            while(window.vid.paused) {
+                window.p.playVideo()
+            }
+            //setTimeout(function() {
                 if (!window.vid.paused) {
                     window.my_played = window.vid.src;
                     console.log('window.vid.src', window.my_played)
-                } else {
-                    window.p.playVideo()
                 }
-            }, 200)
+                //else {
+                //    window.p.playVideo()
+                //}
+            //}, 200)
             
             //setTimeout(function() {
-            var right = document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')
-            while(!right) {
-                right = document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')
+            if (_url.indexOf('&list=') != -1) {
+                var right = document.querySelector('ytm-playlist')
+                right.setAttribute('style', 'position:absolute;right:0;top:'+video_height+'px;background:#fff;display:block;z-index:99999')
+                console.log('ytm-playlist', right)
+            } else {
+                var right = document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')
+                while(!right) {
+                    right = document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')
+                }
+                right[1].setAttribute('style', 'position:absolute;right:0;top:'+video_height+'px;background:#fff;display:block;z-index:99999')
+                console.log('ytm-item-section-renderer', right)
             }
-            right[1].setAttribute('style', 'position:absolute;right:0;top:1080px;background:#fff;display:block;z-index:99999')
-            console.log('ytm-item-section-renderer', right)
             //}, 1000)
             
-            var dur = window.p.getDuration()
+            window.dur = window.p.getDuration()
+            
             i___2 = setInterval(function() {
                 if(!window.p) {
                     return
                 }
                 var cur = window.p.getCurrentTime()
-                if (cur >= (dur - cMovieEnd)) {
-                    window.my_played = 'on END';
+                if (window.dur > 0 && cur >= (window.dur - cMovieEnd)) {
+                    clearInterval(i___2)
+                    window.p.seekTo(window.dur - 2);
+                    window.dur = 0;
+                    
+                    // window.my_played = '#on_END';
+                    
+                    /*
                     window.p.pauseVideo();
                     
                     if (_url.indexOf('&list=') != -1) {
@@ -150,24 +171,28 @@ window.setTimeout(function() {
                     } else {
                         window.p.nextVideo()
                     }
+                    */
+                    
+                    /*
                     window.p = null;
                     //clearInterval(i___1)
                     i___1 = setInterval(function() {
                         // console.log('========== on end video setInterval', i___1, i___2)
                         startPlayer()
-                    }, 2000)
+                    }, 2000)*/
                     //clearInterval(i___2)
                 }
             }, 1000)
         }
-        
+        /*
         i___0 = setInterval(function() {
             //console.log('getPlayer', i___0)
             getPlayer()
-        }, 1000)
+        }, 1000)*/
         
         i___1 = setInterval(function() {
             //console.log('startPlayer', i___1)
+            getPlayer()
             startPlayer()
         }, 2000)
         

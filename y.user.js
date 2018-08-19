@@ -11,8 +11,9 @@ var MOVIE_NAME = [
 ]
 
 var CHANNEL_NAME = [
-    ['ười vi ', 5, 5],
-    ['gon tv 5 ', 20, 5],
+    ['ười vi ', 5, 0],
+    ['gon tv 5 ', 20, 0],
+    ['ews 577', 38, 0],
 ]
 
 function insertAfter(el, referenceNode) {
@@ -40,7 +41,7 @@ window.vid = null;
 window.my_played = '0';
 window.dur = 0
 var i___1, i___2;
-var video_width, video_height, video_css;
+var video_width, video_height, video_css, video_css_debug;
 var video_getPlayer_iv = 5 * 1000
 var video_currentCheck_iv = 1 * 1000
 
@@ -48,10 +49,19 @@ var video_currentCheck_iv = 1 * 1000
 var video_height = 'height:720px;width:1280px;'
 var video_height = 'height:1080px;width:1920px;'
 var video_height = 'height:1050px;width:1867px;'*/
-    
+var isOldPlayer = false;
+
 function getPlayer() {
-    window.p = document.querySelector('#player video')
-    if(window.p) window.vid = window.p
+    window.p = document.getElementById('movie_player') ||
+        document.getElementById('movie_player-flash');
+    if(window.p) {
+        isOldPlayer = true;
+        window.vid = window.p.querySelector('video')
+        console.log('window.vid', window.vid)
+    } else {
+        window.p = document.querySelector('#player video')
+        window.vid = window.p
+    }
     // console.log(window.p)
     _url = location.href
 }
@@ -66,7 +76,7 @@ function startPlayer() {
     if (_url.indexOf('watch?') == -1) {
         return;
     }
-    if (!window.vid) {
+    if (!window.vid || !window.vid.src) {
         console.log('not found video')
         var playButton = document.querySelector('.ytp-cued-thumbnail-overlay .ytp-button')
         if (playButton) {
@@ -75,7 +85,7 @@ function startPlayer() {
         }
         return;
     }
-    console.log('window.my_played', window.my_played, window.vid.src)
+    console.log('startPlayer window.my_played', window.my_played, window.vid.src)
     if (!window.vid.src) return;
     if (window.my_played == window.vid.src) {
         console.log('startPlayer old')
@@ -86,26 +96,30 @@ function startPlayer() {
     }
     console.log('startPlayer new')
     
-    /*
-    var data = window.p.getVideoData()
-    document.title = '@' + data['title'] + ' - Youtube'
-    
-    console.log(window.p, data, window.p.getDuration())
-    
-    var qCur = window.p.getPlaybackQuality()
-    var qSet = 'hd720'
-    if (qCur != qSet) {
-        window.p.setPlaybackQuality(qSet);
-        try {
-            window.p.setPlaybackQualityRange(qSet, qSet);
-        } catch(e) {}
-        document.title = '@720-' + data['title'] + ' - Youtube'
-    }*/
-    
+    var data = null
+    var title = document.title
+    if (isOldPlayer) {
+        data = window.p.getVideoData()
+        title = data['title']
+        title = '@' + title + ' - Youtube'
+        
+        console.log(window.p, data, window.p.getDuration())
+        
+        var qCur = window.p.getPlaybackQuality()
+        var qSet = 'hd720'
+        if (qCur != qSet) {
+            window.p.setPlaybackQuality(qSet);
+            try {
+                window.p.setPlaybackQualityRange(qSet, qSet);
+            } catch(e) {}
+            title = '@720-' + title
+        }
+    }
+    document.title = title
     var div = document.createElement("div");
     div.setAttribute('id', 'my_fixed_title')
     div.setAttribute('style', 'position:fixed;top: 1em;left: 11em;z-index: 9999;color: yellow;background: #393939;max-height: 2em;max-width: 80em;overflow: hidden;')
-    div.innerHTML = '<h2 style="color:yellow">'+video_css + ' - ' + document.title+'</h2>';
+    div.innerHTML = '<h2 style="color:yellow">'+video_css_debug + ' - ' + title+'</h2>';
     document.body.appendChild(div)
     //document.title = document.querySelector('.video-main-content-title').innerText + ' - Youtube'
     
@@ -115,7 +129,7 @@ function startPlayer() {
     for(var i = 0; i < MOVIE_NAME.length; i++) {
         var _movie = MOVIE_NAME[i];
         console.log('_movie', _movie)
-        if (document.title.toLowerCase().indexOf(_movie[0]) != -1) {
+        if (title.toLowerCase().indexOf(_movie[0]) != -1) {
             cMovieName = _movie[0]
             cMovieIntro = _movie[1]
             cMovieEnd = _movie[2]
@@ -126,49 +140,63 @@ function startPlayer() {
     document.documentElement.setAttribute('style','background: #000;')
     document.body.setAttribute('style','background: #000;')
     
-    /*
-    document.querySelector('#player').setAttribute('style',video_css)
-    document.querySelector('.player-container').setAttribute('style','right:0')
-    window.p.setAttribute('style',video_css) //  + 'border: 5px solid green'
-    window.p.querySelector('video').setAttribute('style',video_css)
-    */
-    if (cMovieIntro != 0) {
-        console.log('seek to', cMovieIntro)
-        window.vid.currentTime = cMovieIntro;
-        //p.pauseVideo()
+    if (isOldPlayer) {
+        document.querySelector('#player').setAttribute('style',video_css)
+        document.querySelector('.player-container').setAttribute('style','right:0')
+        window.p.setAttribute('style',video_css) //  + 'border: 5px solid green'
+        window.p.querySelector('video').setAttribute('style',video_css)
     }
     
-    window.vid.play()
-    window.vid.muted = false
+    if (cMovieIntro != 0) {
+        console.log('seek to', cMovieIntro)
+        if (isOldPlayer) {
+            window.p.seekTo(cMovieIntro)
+        } else {
+            window.vid.currentTime = cMovieIntro;
+        }
+        //p.pauseVideo()
+    }
+    if (isOldPlayer) {
+        window.p.playVideo()
+        window.p.unMute()
+    } else {
+        window.vid.play()
+        window.vid.muted = false
+    }
     
     if (window.vid.paused) {
-        window.vid.play()
-        return;
+        if (isOldPlayer) {
+            window.vid.play()
+        } else {
+            window.vid.play()
+        }
     }
 
     if (!window.vid.paused) {
         window.my_played = window.vid.src;
         console.log('window.vid.src', window.my_played)
-        /*
-        var curVideoHeight = window.vid.clientHeight;//document.querySelector('#player').querySelector('video').clientHeight
-        if (_url.indexOf('list=') != -1) {
-            var right = document.querySelector('ytm-playlist')
-            right.setAttribute('style', 'position:absolute;right:0;top:'+curVideoHeight+'px;background:#fff;z-index:99999')
-            right.querySelector('.playlist-content').setAttribute('style', 'position: relative')
-            console.log('ytm-playlist', right)
-        } else {
-            var right = document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')
-            if (!right) {
-                return
+        if (isOldPlayer) {
+            var curVideoHeight = window.vid.clientHeight;//document.querySelector('#player').querySelector('video').clientHeight
+            if (_url.indexOf('list=') != -1) {
+                var right = document.querySelector('ytm-playlist')
+                right.setAttribute('style', 'position:absolute;right:0;top:'+curVideoHeight+'px;background:#fff;z-index:99999')
+                right.querySelector('.playlist-content').setAttribute('style', 'position: relative')
+                console.log('ytm-playlist', right)
+            } else {
+                var right = document.querySelectorAll('.page-container ytm-single-column-watch-next-results-renderer ytm-item-section-renderer')
+                if (!right) {
+                    return
+                }
+                right[1].setAttribute('style', 'position:absolute;right:0;top:'+curVideoHeight+'px;background:#fff;display:block;z-index:99999')
+                console.log('ytm-item-section-renderer', right)
             }
-            right[1].setAttribute('style', 'position:absolute;right:0;top:'+curVideoHeight+'px;background:#fff;display:block;z-index:99999')
-            console.log('ytm-item-section-renderer', right)
         }
-        */
     }
-
-    window.dur = window.vid.duration
-    
+    if (isOldPlayer) {
+        window.dur = window.p.getDuration()
+    } else {
+        window.dur = window.vid.duration
+    }
     /*
     var isEnded = false
     window.vid.ontimeupdate = function() {
@@ -187,9 +215,16 @@ function startPlayer() {
             return
         }
         var cur = window.vid.currentTime
+        if (isOldPlayer) {
+            cur = window.p.getCurrentTime()
+        }
         if (window.dur > 0 && cur >= (window.dur - cMovieEnd)) {
             clearInterval(i___2)
-            window.vid.currentTime = window.dur - 2;
+            if (isOldPlayer) {
+                window.p.seekTo(window.dur - 2)
+            } else {
+                window.vid.currentTime = window.dur - 2;
+            }
             window.dur = 0;
         }
     }, video_currentCheck_iv)
@@ -198,14 +233,27 @@ function startPlayer() {
 function init() {
     if (_url.indexOf('m.youtube.com') != -1) {
         window.setTimeout(function() {
+            getPlayer()
+            
             video_width = '100%'; //window.innerWidth
             video_height = parseInt(window.innerHeight, 10)
             if(!_checkNum(video_height)) {
                 video_height = 550 + 50
             }
             video_height = (video_height - 50) + 'px'
+            
+            if (isOldPlayer) {
+                video_width = parseInt(window.innerWidth, 10)
+                if(!_checkNum(video_width)) {
+                    video_width = '100%'
+                }
+            }
+            if (video_width.toString().indexOf('%') == -1) {
+                video_width = video_width + 'px'
+            }
 
             video_css = 'width:'+video_width+'; height:'+video_height+';'
+            video_css_debug = [video_width, '|', video_height]
 
             console.log(video_css)
 
@@ -225,10 +273,12 @@ function init() {
             return;
         }
         getPlayerDesk()
-        
+            
         window.vid.addEventListener('ended', function() {
             //window.p.mute()
             window.p.querySelector("button.ytp-mute-button").click()
+            var div_e = document.querySelector('#my_fixed_div')
+            div_e.innerHTML += '<hr><div style="font-size: 5em;background:yellow;color:red">FINISHED END VIDEO</div>'
         }, false);
         
         var data = window.p.getVideoData()
